@@ -6,7 +6,7 @@ using Soenneker.Webflow.OpenApiClientUtil.Abstract;
 namespace Soenneker.Webflow.OpenApiClientUtil.Registrars;
 
 /// <summary>
-/// Registers the OpenAPI client utility for dependency injection.
+/// Registers Webflow OpenAPI client providers backed by authenticated transport.
 /// </summary>
 public static class WebflowOpenApiClientUtilRegistrar
 {

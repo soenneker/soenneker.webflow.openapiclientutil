@@ -1,42 +1,63 @@
 [![](https://img.shields.io/nuget/v/soenneker.webflow.openapiclientutil.svg?style=for-the-badge)](https://www.nuget.org/packages/soenneker.webflow.openapiclientutil/)
 [![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.webflow.openapiclientutil/publish-package.yml?style=for-the-badge)](https://github.com/soenneker/soenneker.webflow.openapiclientutil/actions/workflows/publish-package.yml)
 [![](https://img.shields.io/nuget/dt/soenneker.webflow.openapiclientutil.svg?style=for-the-badge)](https://www.nuget.org/packages/soenneker.webflow.openapiclientutil/)
+[![](https://img.shields.io/github/actions/workflow/status/soenneker/soenneker.webflow.openapiclientutil/codeql.yml?style=for-the-badge&label=CodeQL)](https://github.com/soenneker/soenneker.webflow.openapiclientutil/actions/workflows/codeql.yml)
 
 # Soenneker.Webflow.OpenApiClientUtil
 
-Exposes a cached OpenAPI client instance.
+Provides a cached `WebflowOpenApiClient` backed by an authenticated Webflow Data API v2 transport.
 
-## Install
+## Installation
 
 ```bash
 dotnet add package Soenneker.Webflow.OpenApiClientUtil
 ```
 
-## Quick start
+## Configuration
+
+```json
+{
+  "Webflow": {
+    "AccessToken": "your-webflow-access-token"
+  }
+}
+```
+
+The token may be a site token or an OAuth access token and must include the scopes required by the operations being called.
+
+## Registration
 
 ```csharp
 using Soenneker.Webflow.OpenApiClientUtil.Registrars;
-using Microsoft.Extensions.DependencyInjection;
 
-var services = new ServiceCollection();
-var result = services.AddWebflowOpenApiClientUtilAsSingleton();
+services.AddWebflowOpenApiClientUtilAsScoped();
 ```
 
-Adds `WebflowOpenApiClientUtil` as a singleton service.
+Use `AddWebflowOpenApiClientUtilAsSingleton()` to share the generated-client wrapper too. Both registrations borrow the singleton Webflow HTTP provider; disposing a scoped wrapper does not remove or dispose that shared transport.
 
-## What you get
+## Usage
 
-- `IWebflowOpenApiClientUtil` — Exposes a cached OpenAPI client instance.
-- `WebflowOpenApiClientUtilRegistrar` — Registers the OpenAPI client utility for dependency injection.
+```csharp
+using Soenneker.Webflow.OpenApiClient;
+using Soenneker.Webflow.OpenApiClient.Models;
+using Soenneker.Webflow.OpenApiClientUtil.Abstract;
 
-## API at a glance
+public sealed class SiteReader
+{
+    private readonly IWebflowOpenApiClientUtil _clients;
 
-| API | What it does | Result / important behavior |
-| --- | --- | --- |
-| `WebflowOpenApiClientUtilRegistrar.AddWebflowOpenApiClientUtilAsSingleton(services)` | Adds `WebflowOpenApiClientUtil` as a singleton service. | The same service collection, so additional registrations can be chained. |
-| `WebflowOpenApiClientUtilRegistrar.AddWebflowOpenApiClientUtilAsScoped(services)` | Adds `WebflowOpenApiClientUtil` as a scoped service. | The same service collection, so additional registrations can be chained. |
+    public SiteReader(IWebflowOpenApiClientUtil clients)
+    {
+        _clients = clients;
+    }
 
-## Practical notes
+    public async ValueTask<ListSites200Response?> GetSites(
+        CancellationToken cancellationToken)
+    {
+        WebflowOpenApiClient client = await _clients.Get(cancellationToken);
+        return await client.Sites.GetAsync(cancellationToken: cancellationToken);
+    }
+}
+```
 
-- Reuse the registered client instead of constructing one per operation.
-- Dispose instances you own when their scope ends so held resources can be released.
+Listing sites requires the `sites:read` scope. Webflow and transport failures propagate through Kiota exceptions.

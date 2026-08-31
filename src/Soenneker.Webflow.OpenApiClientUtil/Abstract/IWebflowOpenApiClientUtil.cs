@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 namespace Soenneker.Webflow.OpenApiClientUtil.Abstract;
 
 /// <summary>
-/// Exposes a cached OpenAPI client instance.
+/// Provides a cached Webflow OpenAPI client backed by authenticated transport.
 /// </summary>
-public interface IWebflowOpenApiClientUtil: IDisposable, IAsyncDisposable
+public interface IWebflowOpenApiClientUtil : IDisposable, IAsyncDisposable
 {
     /// <summary>
-    /// Returns the configured webflow OpenAPI Client used by the Webflow OpenAPI Client.
+    /// Gets the client, creating it on first use.
     /// </summary>
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
-    /// <returns>A task whose result is the requested webflow OpenAPI Client.</returns>
+    /// <returns>The cached client.</returns>
     ValueTask<WebflowOpenApiClient> Get(CancellationToken cancellationToken = default);
 }
