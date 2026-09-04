@@ -11,6 +11,7 @@ using Soenneker.Utils.AsyncSingleton;
 
 namespace Soenneker.Webflow.OpenApiClientUtil;
 
+/// <inheritdoc cref="IWebflowOpenApiClientUtil" />
 public sealed class WebflowOpenApiClientUtil : IWebflowOpenApiClientUtil
 {
     private readonly AsyncSingleton<WebflowOpenApiClient> _client;
