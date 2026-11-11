@@ -46,7 +46,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.Webflow.HttpClients" Version="11.0.89" />
-        <PackageReference Include="Soenneker.Webflow.OpenApiClient" Version="11.0.47" />
+        <PackageReference Include="Soenneker.Webflow.HttpClients" Version="11.0.92" />
+        <PackageReference Include="Soenneker.Webflow.OpenApiClient" Version="11.0.48" />
     </ItemGroup>
 </Project>
